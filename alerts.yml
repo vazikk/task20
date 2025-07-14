@@ -1,0 +1,22 @@
+groups:
+  - name: CPU-RAM-alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 * (1 - avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[1m])) > 0.1)
+        for: 1m
+        labels:
+          severity: critical
+          instance: 'Local machine'
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% (over 10% for 1 minute)"
+
+      - alert: HighRamUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.50
+        for: 1m
+        labels:
+          severity: critical
+          instance: 'AWS instance'
+        annotations:
+          summary: "High RAM usage on {{ $labels.instance }}"
+          description: "RAM usage is {{ $value }}% (over 10% for 1 minute)"
